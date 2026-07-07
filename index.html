@@ -364,7 +364,7 @@
   }
   @media (max-width:600px){
     .video-player-background{ padding-left:4vw; padding-right:4vw; }
-    .video-player-container{ height:56vh; padding:14px; border-radius:16px; }
+    .video-player-container{position:relative; width:100%; aspect-ratio:16/9; height:56vh; padding:14px; border-radius:16px; }
     .video-player-bttns{ display: flex; gap:80px; margin: 1vh 5vw; justify-content: center; }
   }
 
@@ -465,10 +465,8 @@
           <iframe
               id="video-player"
               src="https://drive.google.com/file/d/1--ManjjVoqmZmOn5c20rHIBVSwctnN15/preview"
-              width="100%"
-              height="100%"
               allow="&vq=hd1080; fullscreen"
-              style="flex: 1 1 auto; border:none; border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.5);"
+              style="width:100%; height=100%; flex: 1 1 auto; border: 0; border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.5);"
               allowfullscreen="true">
           </iframe>
       </div>
@@ -860,11 +858,6 @@ document.addEventListener('keydown', (event) =>{
     toggleVideoPlayer();
   }
 });
-
-// againBtn.addEventListener('click', ()=>{
-//   resultCard.classList.remove('show');
-//   hint.textContent = 'Click "Spin the wheel", let it fly, then click "Stop!" to lock in your fortune.';
-// });
 </script>
 </body>
 </html>
