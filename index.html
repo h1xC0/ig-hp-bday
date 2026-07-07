@@ -820,11 +820,11 @@ let scrollLockY = 0;
 function toggleVideoPlayer() {
   videoPlayerContainer.classList.toggle('show');
   videoPlayerBackground.classList.toggle('show');
-
-  const link = `https://drive.google.com/file/d/${VIDEO_ID[selectedCategory]}/preview`;
+  const link = `https://drive.google.com/file/d/${VIDEO_ID[0]}/preview`;
   const blank = 'about:blank';
   const isOpening = videoPlayerBackground.classList.contains('show');
 
+  console.log("Link: {}", link)
   videoPlayer.src = isOpening ? link : blank;
 
   // iOS Safari ignores `overflow:hidden` on body while a fixed-position
