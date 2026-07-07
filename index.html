@@ -488,7 +488,7 @@
 // signed by a random name from this list combined with a category.
 // ---------------------------------------------------------------
 const NAMES = ["Alex","Maria","Daniel","Sophie","James","Elena","Michael","Anna","Chris","Olivia","Nina","Victor"];
-const VIDEO_ID = ["1--ManjjVoqmZmOn5c20rHIBVSwctnN15"]
+const VIDEO_ID = ["1sTPkD5FWt4Mq78JVLrr52CT2d3SMi5Ao"]
 const CATEGORIES = [
   "Health","Rest","Success","New Projects","Wishes Come True","Prosperity",
   "Inspiration","Adventure","Growth","Happiness","Leadership","Team Spirit",
@@ -674,6 +674,7 @@ let decelerating = false;
 let spinSpeed = 0;
 let rafId = null;
 let lastTime = null;
+let selectedCategory = 0;
 
 const spinBtn = document.getElementById('spinBtn');
 const stopBtn = document.getElementById('stopBtn');
@@ -772,6 +773,7 @@ function finishSpin(index){
   decelerating = false;
   wheelWrapEl.classList.remove('spinning'); // release GPU layer once idle
   const cat = CATEGORIES[index];
+  selectedCategory = index;
   const pool = MESSAGE_POOL[cat];
   const message = pool[Math.floor(Math.random() * pool.length)];
 
@@ -818,7 +820,7 @@ function toggleVideoPlayer() {
   videoPlayerContainer.classList.toggle('show');
   videoPlayerBackground.classList.toggle('show');
 
-  const link = `https://drive.google.com/file/d/${VIDEO_ID[0]}/preview`;
+  const link = `https://drive.google.com/file/d/${VIDEO_ID[selectedCategory]}/preview`;
   const blank = 'about:blank';
   const isOpening = videoPlayerBackground.classList.contains('show');
 
