@@ -156,7 +156,7 @@
     left:50%;
     width:2px;
     height:2px;
-    text-align:center;
+    text-align: right;
   }
   .sector-label span{
     transform: rotate(-90deg);
@@ -165,12 +165,12 @@
     width:25%;
     left:-12.5%;
     top:0;
-    font-size:clamp(9px,3.1vw,12px);
+    font-size:clamp(9px,3.1vw,14px);
     font-weight:600;
     color:#fff;
     text-shadow:0 1px 3px rgba(0,0,0,0.55);
     line-height:1.15;
-    white-space:normal;
+    white-space: normal;
   }
 
   .fortune-container{
@@ -490,7 +490,7 @@
 const NAMES = ["Alex","Maria","Daniel","Sophie","James","Elena","Michael","Anna","Chris","Olivia","Nina","Victor"];
 const VIDEO_ID = ["1sTPkD5FWt4Mq78JVLrr52CT2d3SMi5Ao"]
 const CATEGORIES = [
-  "Health","Rest","Success","New Projects","Wishes Come True","Prosperity",
+  "Health","Rest","Success","New Projects","Wishes","Prosperity",
   "Inspiration","Adventure","Growth","Happiness","Leadership","Team Spirit",
   "Energy","Creativity","Harmony","Victory"
 ];
@@ -522,7 +522,7 @@ const TEMPLATES = {
     "{name} hopes you get to build something you're truly proud of this year.",
     "Wishing you a pipeline full of exciting new ventures — with energy, {name}."
   ],
-  "Wishes Come True": [
+  "Wishes": [
     "{name} wishes that every single one of your wishes comes true this year.",
     "From {name}: may the universe finally deliver on everything you've been hoping for.",
     "{name} hopes this is the year your biggest dream quietly becomes reality.",
@@ -631,7 +631,7 @@ function colorFor(i){ return COLOR_CYCLE[i % COLOR_CYCLE.length]; }
   wheelEl.style.background = `conic-gradient(from 0deg, ${stops.join(',')})`;
 
   CATEGORIES.forEach((cat,i)=>{
-    const mid = i * sectorAngle + sectorAngle/2;
+    const mid = i * sectorAngle + sectorAngle/2 + 10;
     const wrap = document.createElement('div');
     wrap.className = 'sector-label';
     wrap.style.transform = `translate(-50%,-50%) rotate(${mid}deg) translateY(-118px)`;
@@ -650,7 +650,7 @@ function colorFor(i){ return COLOR_CYCLE[i % COLOR_CYCLE.length]; }
 function repositionLabels(){
   const size = wheelEl.getBoundingClientRect().height;
   if(!size) return;
-  const radius = size * 0.31; // 118/380 ≈ 0.31
+  const radius = size * 0.25; // 118/380 ≈ 0.31
   wheelEl.querySelectorAll('.sector-label').forEach((wrap,i)=>{
     const mid = i * sectorAngle + sectorAngle/2;
     wrap.style.transform = `translate(-50%,-50%) rotate(${mid}deg) translateY(-${radius}px)`;
@@ -663,9 +663,10 @@ function debounce(fn, wait){
     t = setTimeout(()=>fn.apply(this,args), wait);
   };
 }
-window.addEventListener('resize', debounce(repositionLabels, 150));
-window.addEventListener('orientationchange', ()=>setTimeout(repositionLabels, 200));
-requestAnimationFrame(repositionLabels);
+// window.addEventListener('resize', debounce(repositionLabels, 150));
+// window.addEventListener('orientationchange', ()=>setTimeout(repositionLabels, 200));
+repositionLabels();
+// requestAnimationFrame(repositionLabels);
 
 // ---------------- Spin mechanics ----------------
 let rotation = 0;
