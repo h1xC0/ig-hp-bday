@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#3B1163">
+<title>Happy Birthday, Igor Kopmar!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --deep-purple:#3B1163;
+    --purple:#6B21A8;
+    --violet:#9345E0;
+    --orange:#FF7A1A;
+    --gold:#FFC93C;
+    --cream:#FFF7E8;
+  }
+  *{box-sizing:border-box;}
+  html{
+    height:-webkit-fill-available;
+  }
+  body{
+    margin:0;
+    min-height:100vh;
+    min-height:100dvh;
+    min-height:-webkit-fill-available;
+    font-family:'Poppins',sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,201,60,0.25), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(255,122,26,0.25), transparent 40%),
+      linear-gradient(160deg, var(--deep-purple) 0%, var(--purple) 45%, #4B1A85 75%, var(--deep-purple) 100%);
+    color:var(--cream);
+    overflow-x:hidden;
+    position:relative;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  /* Fixed attachment is dropped on mobile (see media query below):
+     fixed backgrounds force a full-page repaint on scroll in mobile
+     Safari/Chrome, which is a common jank source on phones. */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5) 0, transparent 50%),
+      radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,0.4) 0, transparent 50%),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.35) 0, transparent 50%),
+      radial-gradient(2px 2px at 90% 20%, rgba(255,255,255,0.4) 0, transparent 50%),
+      radial-gradient(1.5px 1.5px at 55% 15%, rgba(255,255,255,0.3) 0, transparent 50%);
+    background-repeat:no-repeat;
+    background-size:100% 100%;
+    pointer-events:none;
+    z-index:0;
+  }
+  @media (max-width:600px){
+    body::before{
+      /* position:fixed with inset:0 sizes against the viewport
+         automatically. position:absolute instead sizes against
+         body's own box, which only grows to fit content — if that's
+         shorter/taller than the viewport the gradient box no longer
+         matches 100dvh and the tiny 1.5-2px dot gradients visibly
+         repeat to fill the mismatch. Pin explicit height so the box
+         always matches the full page regardless of static positioning. */
+      position:absolute;
+      height:100%;
+      min-height:100dvh;
+    }
+  }
+  .page{
+    position:relative;
+    z-index:1;
+    max-width:760px;
+    margin:0 auto;
+    padding:48px 20px 80px;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-block;
+    font-size:13px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:'Playfair Display',serif;
+    font-weight:800;
+    font-size:clamp(32px,6vw,58px);
+    margin:0 0 10px;
+    background:linear-gradient(90deg, var(--gold), var(--orange), var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    line-height:1.1;
+  }
+  .subtitle{
+    font-size:17px;
+    color:#EAD9FF;
+    max-width:540px;
+    margin:0 auto 44px;
+    line-height:1.6;
+  }
+  .subtitle b{color:var(--gold); font-weight:600;}
+
+  .wheel-wrap{
+    position:relative;
+    width:min(380px,80vw,72dvh);
+    height:min(380px,80vw,72dvh);
+    margin:0 auto 34px;
+  }
+  /* GPU layer for the spinning wheel is only promoted while it's
+     actually animating (class toggled in JS), so idle phones aren't
+     holding an extra composited layer for no reason. */
+  .wheel-wrap.spinning .wheel{
+    will-change:transform;
+  }
+  .pointer{
+    position:absolute;
+    top:-14px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;height:0;
+    border-left:16px solid transparent;
+    border-right:16px solid transparent;
+    border-top:30px solid var(--gold);
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    z-index:5;
+  }
+  .wheel-outer{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    padding:10px;
+    background:linear-gradient(145deg, var(--gold), var(--orange) 40%, var(--purple) 70%, var(--gold));
+    box-shadow:0 0 0 4px rgba(255,255,255,0.15), 0 20px 50px rgba(0,0,0,0.45);
+  }
+  .wheel{
+    position:relative;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    border:4px solid rgba(255,247,232,0.85);
+    overflow:hidden;
+  }
+  .sector-label{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:2px;
+    height:2px;
+    text-align:center;
+  }
+  .sector-label span{
+    transform: rotate(-90deg);
+    position:absolute;
+    display:block;
+    width:25%;
+    left:-12.5%;
+    top:0;
+    font-size:clamp(9px,3.1vw,12px);
+    font-weight:600;
+    color:#fff;
+    text-shadow:0 1px 3px rgba(0,0,0,0.55);
+    line-height:1.15;
+    white-space:normal;
+  }
+
+  .fortune-container{
+      display: block;
+  }
+
+  .fortune-container.show{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 810px)
+  {
+      .fortune-container
+      {
+          display: block;
+      }
+      .fortune-container.show
+      {
+          display: block;
+      }
+  }
+
+
+  .hub{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:64px;height:64px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--gold) 60%, var(--orange));
+    border:3px solid var(--cream);
+    box-shadow:0 4px 14px rgba(0,0,0,0.5);
+    z-index:6;
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;
+  }
+
+  .controls{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    margin-bottom:36px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:16px;
+    padding:14px 34px;
+    border-radius:40px;
+    border:none;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    letter-spacing:0.5px;
+  }
+  .btn:active{transform:scale(0.96);}
+  .btn:disabled{opacity:0.4; cursor:not-allowed;}
+  .btn-spin{
+    background:linear-gradient(120deg, var(--orange), var(--gold));
+    color:#3B1163;
+    box-shadow:0 8px 20px rgba(255,122,26,0.4);
+  }
+  .btn-spin:not(:disabled):hover{box-shadow:0 10px 26px rgba(255,122,26,0.55);}
+  .btn-stop{
+    background:linear-gradient(120deg, var(--violet), var(--purple));
+    color:var(--cream);
+    box-shadow:0 8px 20px rgba(107,33,168,0.5);
+  }
+  .btn-stop:not(:disabled):hover{box-shadow:0 10px 26px rgba(107,33,168,0.65);}
+
+  .result-card{
+    position: absolute;
+    max-width:520px;
+    margin:0 auto;
+    margin-bottom: 20px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+    border:1px solid rgba(255,201,60,0.5);
+    border-radius:20px;
+    padding:30px 28px 26px;
+    backdrop-filter:blur(6px);
+    opacity:0;
+    visibility: hidden;
+    transform:translateY(16px) scale(0.97);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .result-card.show{position:relative; opacity:1; transform:translateY(0) scale(1); visibility: visible;}
+  .ribbon{
+    display:inline-block;
+    background:linear-gradient(90deg, var(--gold), var(--orange));
+    color:#3B1163;
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:7px 18px;
+    border-radius:30px;
+    margin-bottom:16px;
+  }
+  #resultMessage{
+    font-size:19px;
+    line-height:1.55;
+    color:#FFF9EE;
+    margin:0 0 22px;
+    font-family:'Playfair Display',serif;
+    font-weight:600;
+  }
+  .btn-again{
+    background:transparent;
+    border:2px solid var(--gold);
+    color:var(--gold);
+    font-weight:600;
+    padding:10px 26px;
+    border-radius:30px;
+    cursor:pointer;
+    font-family:'Poppins',sans-serif;
+  }
+  .btn-again:hover{background:rgba(255,201,60,0.15);}
+
+  .hint{
+    margin-top:18px;
+    font-size:13px;
+    color:#C9AFEF;
+  }
+
+  .confetti{
+    position:fixed;
+    top:-10px;
+    width:9px;height:14px;
+    z-index:20;
+    pointer-events:none;
+    border-radius:2px;
+    animation:fall linear forwards;
+    /* transform+opacity only: stays on the GPU compositor and
+       avoids triggering layout/paint on the rest of the page */
+    will-change:transform,opacity;
+  }
+  @media (prefers-reduced-motion:reduce){
+    .confetti{ display:none; }
+  }
+
+  .video-player-container{
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width:900px;
+      height: 650px;
+      max-height:70dvh;
+      background:linear-gradient(160deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+      margin:0 auto 24px;
+      border:1px solid rgba(255,201,60,0.5);
+      border-radius:20px;
+      padding:20px;
+      backdrop-filter:blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(16px) scale(0.8);
+      z-index: 100;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+
+  .video-player-container.show{
+      transform: translateY(0px) scale(1);
+      opacity: 1;
+      visibility: visible;
+      /*transition-delay: 0ms;*/
+      /*transition: transform 0.5s ease, opacity 0.5s ease;*/
+  }
+
+  .video-player-background{
+      position: fixed;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      padding: 2rem 5vw;
+      padding: max(1.25rem, env(safe-area-inset-top)) max(5vw, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(5vw, env(safe-area-inset-left));
+      top: 0;
+      left: 0;
+      background-color: rgba(0,0,0,0.8);
+      z-index: 100;
+      width: 100%;
+      height: 100%;
+      height:100dvh;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease;
+  }
+  @media (max-width:600px){
+    .video-player-background{ padding-left:4vw; padding-right:4vw; }
+    .video-player-container{ height:56vh; padding:14px; border-radius:16px; }
+    .video-player-bttns{ display: flex; gap:80px; margin: 1vh 5vw; justify-content: center; }
+  }
+
+  .video-player-background.show{
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.5s ease-out;
+      overflow: hidden;
+  }
+
+  .video-player-bttns{
+      display: flex;
+      gap: 60px;
+      justify-content: center;
+      margin: 1vh 5vw;
+  }
+
+  @keyframes fall{
+    to{ transform:translateY(105vh) rotate(720deg); opacity:0.2; }
+  }
+
+  footer{
+    font-size:13px;
+    color:#B79AE0;
+  }
+
+  /* -----------------------------------------------------------------
+     Mobile phones (portrait phones, ~600px and down): tighten layout,
+     shrink heavy blur (backdrop-filter is one of the most expensive
+     CSS effects to composite on mid/low-tier Android GPUs), and give
+     buttons full-width touch-friendly targets.
+  ----------------------------------------------------------------- */
+  @media (max-width:600px){
+    .page{ padding:32px 16px 56px; }
+    .subtitle{ font-size:15px; margin-bottom:32px; }
+    .wheel-wrap{ margin-bottom:24px; }
+    .hub{ width:52px; height:52px; font-size:20px; }
+    .pointer{
+      top:-11px;
+      border-left-width:12px;
+      border-right-width:12px;
+      border-top-width:22px;
+    }
+    .controls{ gap:12px; margin-bottom:28px; }
+    .btn{ font-size:15px; padding:13px 0; flex:1 1 140px; min-height:48px; }
+    .result-card{ padding:22px 18px 20px; backdrop-filter:blur(3px); }
+    #resultMessage{ font-size:17px; }
+    .video-player-container{ backdrop-filter:blur(3px); }
+  }
+
+  /* Landscape phones: the wheel is the tallest element, so cap it to
+     viewport height rather than width so it never pushes controls
+     off-screen. */
+  @media (max-width:900px) and (max-height:500px) and (orientation:landscape){
+    .page{ padding:20px 16px 32px; }
+    .wheel-wrap{ width:min(280px,60dvh); height:min(280px,60dvh); margin-bottom:16px; }
+    .subtitle{ margin-bottom:20px; }
+    h1{ font-size:clamp(24px,5vw,36px); }
+  }
+
+  /* Respect the OS-level reduced motion preference throughout,
+     beyond just confetti: disable decorative transitions. */
+  @media (prefers-reduced-motion:reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <span class="eyebrow">From the whole team</span>
+  <h1>Happy Birthday,<br>Igor Kopmar!</h1>
+  <p class="subtitle">Spin the <b>Wheel of Birthday Fortune</b> to see what the year ahead holds for you —
+  and which colleague is sending you the wish. Give it a spin, hit stop whenever you dare, and let fate deliver your birthday fortune!</p>
+
+  <div class="fortune-container" id="fortuneContainer">
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <div class="wheel-outer">
+          <div class="wheel" id="wheel"></div>
+        </div>
+        <div class="hub">🎂</div>
+      </div>
+
+      <div class="result-card" id="resultCard">
+        <div class="ribbon" id="resultCategory">Health</div>
+        <p id="resultMessage">Your birthday fortune will appear here.</p>
+        <button class="btn-again" id="watchVideoBtn">Watch Video</button>
+      </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-spin" id="spinBtn">Spin the wheel</button>
+    <button class="btn btn-stop" id="stopBtn" disabled>Stop!</button>
+  </div>
+
+  <div class="video-player-background" id="video-player-background">
+      <div class="video-player-container" id="video-player-container">
+          <iframe
+              id="video-player"
+              src="https://drive.google.com/file/d/1--ManjjVoqmZmOn5c20rHIBVSwctnN15/preview"
+              width="100%"
+              height="100%"
+              allow="&vq=hd1080; fullscreen"
+              style="flex: 1 1 auto; border:none; border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.5);"
+              allowfullscreen="true">
+          </iframe>
+      </div>
+      <div class="video-player-bttns">
+          <button class="btn btn-spin" id="againBtn" style="transform: scale(1.25);">Spin Again!</button>
+          <button class="btn btn-again" id="closeBtn" style="transform: scale(1.25);">Close</button>
+      </div>
+  </div>
+
+  <p class="hint" id="hint">Click "Spin the wheel", let it fly, then click "Stop!" to lock in your fortune.</p>
+  <footer>Made with admiration by the team, for Igor's special day 🎉</footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// EDIT ME: swap in your real teammates' names here — every wish is
+// signed by a random name from this list combined with a category.
+// ---------------------------------------------------------------
+const NAMES = ["Alex","Maria","Daniel","Sophie","James","Elena","Michael","Anna","Chris","Olivia","Nina","Victor"];
+const VIDEO_ID = ["1--ManjjVoqmZmOn5c20rHIBVSwctnN15"]
+const CATEGORIES = [
+  "Health","Rest","Success","New Projects","Wishes Come True","Prosperity",
+  "Inspiration","Adventure","Growth","Happiness","Leadership","Team Spirit",
+  "Energy","Creativity","Harmony","Victory"
+];
+
+const COLOR_CYCLE = ["#5B1A8C","#8B3FD4","#FF8C1A","#FFC93C"];
+
+const TEMPLATES = {
+  "Health": [
+    "{name} wishes you unstoppable energy and iron health all year long, Igor!",
+    "From {name}: may your health stay as strong as your leadership, today and always.",
+    "{name} hopes you feel energetic, strong, and full of life every single day this year.",
+    "Wishing you endless stamina and zero sick days — with warm respect, from {name}."
+  ],
+  "Rest": [
+    "{name} wishes you real rest this year — the kind that actually recharges you.",
+    "From {name}: may you find time to slow down and enjoy a well-earned break.",
+    "{name} hopes your calendar leaves room for peaceful evenings and lazy weekends.",
+    "May this year bring you calm mornings and restful nights — with love, {name}."
+  ],
+  "Success": [
+    "{name} wishes you a year stacked with wins, big and small, Igor!",
+    "From {name}: may every goal you set this year turn into a victory.",
+    "{name} hopes success follows you into every meeting, deal, and decision this year.",
+    "Here's to a year where everything you touch turns to success — from {name}."
+  ],
+  "New Projects": [
+    "{name} wishes you bold new projects that make work feel exciting again.",
+    "From {name}: may this year bring fresh ideas and the courage to launch them.",
+    "{name} hopes you get to build something you're truly proud of this year.",
+    "Wishing you a pipeline full of exciting new ventures — with energy, {name}."
+  ],
+  "Wishes Come True": [
+    "{name} wishes that every single one of your wishes comes true this year.",
+    "From {name}: may the universe finally deliver on everything you've been hoping for.",
+    "{name} hopes this is the year your biggest dream quietly becomes reality.",
+    "May your birthday candles carry real magic this year — from {name}."
+  ],
+  "Prosperity": [
+    "{name} wishes you prosperity that keeps multiplying, Igor — in every sense of the word.",
+    "From {name}: may abundance find its way to you and everyone you lead.",
+    "{name} hopes this year brings growth, wealth, and every good thing you deserve.",
+    "Wishing you a year of prosperity that overflows onto the whole team — from {name}."
+  ],
+  "Inspiration": [
+    "{name} wishes you a steady spark of inspiration all year round.",
+    "From {name}: may fresh ideas keep finding you exactly when you need them.",
+    "{name} hopes you stay inspired enough to inspire everyone around you too.",
+    "Wishing you a mind full of new ideas and the drive to chase them — {name}."
+  ],
+  "Adventure": [
+    "{name} wishes you a year full of adventures, both in life and at work.",
+    "From {name}: may you say yes to something bold and unexpected this year.",
+    "{name} hopes your birthday marks the start of a genuinely exciting chapter.",
+    "Here's to new places, new challenges, and new stories — with warmth, {name}."
+  ],
+  "Growth": [
+    "{name} wishes you a year of real growth — personal and professional.",
+    "From {name}: may every challenge this year make you a little stronger.",
+    "{name} hopes you look back next birthday amazed by how far you've come.",
+    "Wishing you constant, steady growth in everything that matters — from {name}."
+  ],
+  "Happiness": [
+    "{name} wishes you plain, simple happiness — the kind that needs no reason.",
+    "From {name}: may this year be full of small joys and big smiles.",
+    "{name} hopes happiness finds you on ordinary days, not just special ones.",
+    "Wishing you a heart full of joy all year long — with love, {name}."
+  ],
+  "Leadership": [
+    "{name} wishes you the clarity and confidence to keep leading brilliantly.",
+    "From {name}: thank you for the kind of leadership that makes people want to follow.",
+    "{name} hopes your example keeps inspiring the whole team this year too.",
+    "Wishing you the wisdom to lead and the humility to keep learning — {name}."
+  ],
+  "Team Spirit": [
+    "{name} wishes you a year where the whole team feels like one another's biggest fans.",
+    "From {name}: thank you for building a team that actually enjoys working together.",
+    "{name} hopes this year brings even more moments of genuine team pride.",
+    "Wishing you a team that has your back all year — with gratitude, {name}."
+  ],
+  "Energy": [
+    "{name} wishes you the kind of energy that lights up every room you walk into.",
+    "From {name}: may your motivation never run low, even on the tough days.",
+    "{name} hopes you feel unstoppable and energized all year long.",
+    "Wishing you boundless energy for every goal ahead — from {name}."
+  ],
+  "Creativity": [
+    "{name} wishes you a year overflowing with creative solutions and bold ideas.",
+    "From {name}: may your creativity keep surprising even yourself this year.",
+    "{name} hopes you find fresh, clever ways to solve old problems.",
+    "Wishing you a mind that never runs out of ideas — with admiration, {name}."
+  ],
+  "Harmony": [
+    "{name} wishes you real balance — between work, rest, and everything in between.",
+    "From {name}: may this year bring harmony to your days and your decisions.",
+    "{name} hopes you find peace even in the busiest weeks ahead.",
+    "Wishing you a year of balance and calm — with care, from {name}."
+  ],
+  "Victory": [
+    "{name} wishes you a year of clear, well-earned victories, Igor!",
+    "From {name}: may every effort this year end in a proud win.",
+    "{name} hopes this is your most victorious year yet, personally and professionally.",
+    "Here's to another year of winning at what matters — from {name}."
+  ]
+};
+
+// -----------------------------------------------------------------
+// Build a large pool of unique greetings (one for every day of the
+// year and then some) by combining templates with names, per sector.
+// -----------------------------------------------------------------
+function buildPool(){
+  const pool = {};
+  CATEGORIES.forEach(cat=>{
+    const list = [];
+    TEMPLATES[cat].forEach(tpl=>{
+      NAMES.forEach(name=>{
+        list.push(tpl.replace("{name}", name));
+      });
+    });
+    pool[cat] = list;
+  });
+  return pool;
+}
+const MESSAGE_POOL = buildPool();
+
+// ---------------- Wheel construction ----------------
+const wheelEl = document.getElementById('wheel');
+const sectorAngle = 360 / CATEGORIES.length;
+
+function colorFor(i){ return COLOR_CYCLE[i % COLOR_CYCLE.length]; }
+
+(function buildWheel(){
+  const stops = [];
+  CATEGORIES.forEach((cat,i)=>{
+    const from = (i * sectorAngle).toFixed(3);
+    const to = ((i+1) * sectorAngle).toFixed(3);
+    stops.push(`${colorFor(i)} ${from}deg ${to}deg`);
+  });
+  wheelEl.style.background = `conic-gradient(from 0deg, ${stops.join(',')})`;
+
+  CATEGORIES.forEach((cat,i)=>{
+    const mid = i * sectorAngle + sectorAngle/2;
+    const wrap = document.createElement('div');
+    wrap.className = 'sector-label';
+    wrap.style.transform = `translate(-50%,-50%) rotate(${mid}deg) translateY(-118px)`;
+    const span = document.createElement('span');
+    span.textContent = cat;
+    wrap.appendChild(span);
+    wheelEl.appendChild(wrap);
+  });
+})();
+
+// Labels are placed at a fixed px radius (correct for the original
+// 380px wheel). Since the wheel itself is now responsive (scales
+// down on small phones), recompute the radius as a % of the wheel's
+// actual rendered size on load, resize, and orientation change so
+// labels stay correctly anchored to the rim at every screen size.
+function repositionLabels(){
+  const size = wheelEl.getBoundingClientRect().height;
+  if(!size) return;
+  const radius = size * 0.31; // 118/380 ≈ 0.31
+  wheelEl.querySelectorAll('.sector-label').forEach((wrap,i)=>{
+    const mid = i * sectorAngle + sectorAngle/2;
+    wrap.style.transform = `translate(-50%,-50%) rotate(${mid}deg) translateY(-${radius}px)`;
+  });
+}
+function debounce(fn, wait){
+  let t;
+  return function(...args){
+    clearTimeout(t);
+    t = setTimeout(()=>fn.apply(this,args), wait);
+  };
+}
+window.addEventListener('resize', debounce(repositionLabels, 150));
+window.addEventListener('orientationchange', ()=>setTimeout(repositionLabels, 200));
+requestAnimationFrame(repositionLabels);
+
+// ---------------- Spin mechanics ----------------
+let rotation = 0;
+let spinning = false;
+let decelerating = false;
+let spinSpeed = 0;
+let rafId = null;
+let lastTime = null;
+
+const spinBtn = document.getElementById('spinBtn');
+const stopBtn = document.getElementById('stopBtn');
+const closeBtn = document.getElementById('closeBtn');
+const againBtn = document.getElementById('againBtn');
+const watchVideoBtn = document.getElementById('watchVideoBtn');
+const resultCard = document.getElementById('resultCard');
+const fortuneContainer = document.getElementById('fortuneContainer');
+const resultCategory = document.getElementById('resultCategory');
+const resultMessage = document.getElementById('resultMessage');
+const hint = document.getElementById('hint');
+const videoPlayerBackground = document.getElementById('video-player-background');
+const videoPlayerContainer = document.getElementById('video-player-container');
+const videoPlayer = document.getElementById('video-player');
+
+function setWheelRotation(deg){
+  wheelEl.style.transform = `rotate(${deg}deg)`;
+}
+
+function spinLoop(ts){
+  if(lastTime === null) lastTime = ts;
+  const dt = (ts - lastTime) / 1000;
+  lastTime = ts;
+
+  if(spinSpeed < 480) spinSpeed = Math.min(480, spinSpeed + dt * 900);
+  rotation = (rotation + spinSpeed * dt) % 360;
+  setWheelRotation(rotation);
+
+  if(spinning){
+    rafId = requestAnimationFrame(spinLoop);
+  }
+}
+
+const wheelWrapEl = document.querySelector('.wheel-wrap');
+
+function startSpin(){
+  if(spinning) return;
+  resultCard.classList.remove('show');
+  fortuneContainer.classList.remove('show');
+  spinning = true;
+  decelerating = false;
+  spinSpeed = 0;
+  lastTime = null;
+  spinBtn.disabled = true;
+  stopBtn.disabled = false;
+  wheelWrapEl.classList.add('spinning'); // promote GPU layer only while animating
+  hint.textContent = "It's spinning… click \"Stop!\" whenever you're ready.";
+  rafId = requestAnimationFrame(spinLoop);
+}
+
+function pickWeightedSector(){
+  return Math.floor(Math.random() * CATEGORIES.length);
+}
+
+function decelerate(){
+  if(decelerating) return;
+  spinning = false;
+  decelerating = true;
+  cancelAnimationFrame(rafId);
+  stopBtn.disabled = true;
+
+  const targetIndex = pickWeightedSector();
+  const mid = targetIndex * sectorAngle + sectorAngle / 2;
+
+  const currentNorm = ((rotation % 360) + 360) % 360;
+  const targetOffset = ((360 - mid) % 360 + 360) % 360;
+  const extraSpins = 4 + Math.floor(Math.random() * 3);
+  let delta = (targetOffset - currentNorm + 360) % 360;
+  delta += extraSpins * 360;
+
+  const startRotation = rotation;
+  const finalRotation = rotation + delta;
+  const duration = 3800 + Math.random() * 900;
+  const startTime = performance.now();
+
+  function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
+
+  function decLoop(now){
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const eased = easeOutQuint(t);
+    rotation = startRotation + delta * eased;
+    setWheelRotation(rotation);
+    if(t < 1){
+      requestAnimationFrame(decLoop);
+    } else {
+      rotation = finalRotation % 360;
+      setWheelRotation(rotation);
+      finishSpin(targetIndex);
+    }
+  }
+  requestAnimationFrame(decLoop);
+}
+
+function finishSpin(index){
+  decelerating = false;
+  wheelWrapEl.classList.remove('spinning'); // release GPU layer once idle
+  const cat = CATEGORIES[index];
+  const pool = MESSAGE_POOL[cat];
+  const message = pool[Math.floor(Math.random() * pool.length)];
+
+  resultCategory.textContent = cat;
+  resultCategory.style.background = `linear-gradient(90deg, ${colorFor(index)}, var(--gold))`;
+  resultMessage.textContent = message;
+  resultCard.classList.add('show');
+  fortuneContainer.classList.add('show')
+  hint.textContent = "Happy birthday, Igor! Spin again for another fortune.";
+  spinBtn.disabled = false;
+  launchConfetti();
+}
+
+// Fewer particles on small/low-power screens: confetti count is the
+// single biggest per-spin DOM cost on low-end Android phones, since
+// each piece is a real element running its own CSS animation.
+const IS_SMALL_SCREEN = Math.min(window.innerWidth, window.innerHeight) < 480;
+const PREFERS_REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CONFETTI_COUNT = PREFERS_REDUCED_MOTION ? 0 : (IS_SMALL_SCREEN ? 26 : 60);
+
+function launchConfetti(){
+  if(CONFETTI_COUNT === 0) return;
+  const colors = ["#FFC93C","#FF8C1A","#9345E0","#6B21A8","#FFF7E8"];
+  // Batch DOM writes into a fragment: one reflow instead of N.
+  const frag = document.createDocumentFragment();
+  const pieces = [];
+  for(let i=0;i<CONFETTI_COUNT;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration = (2.5 + Math.random()*2) + 's';
+    el.style.opacity = 0.7 + Math.random()*0.3;
+    frag.appendChild(el);
+    pieces.push(el);
+  }
+  document.body.appendChild(frag);
+  setTimeout(()=>{ pieces.forEach(el => el.remove()); }, 5200);
+}
+
+let scrollLockY = 0;
+
+function toggleVideoPlayer() {
+  videoPlayerContainer.classList.toggle('show');
+  videoPlayerBackground.classList.toggle('show');
+
+  const link = `https://drive.google.com/file/d/${VIDEO_ID[0]}/preview`;
+  const blank = 'about:blank';
+  const isOpening = videoPlayerBackground.classList.contains('show');
+
+  videoPlayer.src = isOpening ? link : blank;
+
+  // iOS Safari ignores `overflow:hidden` on body while a fixed-position
+  // overlay is open and still scrolls the page underneath. Locking via
+  // position:fixed + storing/restoring scrollY is the reliable fix.
+  if(isOpening){
+    scrollLockY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollLockY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, scrollLockY);
+  }
+}
+
+spinBtn.addEventListener('click', startSpin);
+stopBtn.addEventListener('click', decelerate);
+closeBtn.addEventListener('click', toggleVideoPlayer);
+watchVideoBtn.addEventListener('click', toggleVideoPlayer);
+againBtn.addEventListener('click', (event) => {
+  toggleVideoPlayer();
+  startSpin();
+});
+document.addEventListener('keydown', (event) =>{
+  if(event.key == "i"){
+    toggleVideoPlayer();
+  }
+});
+
+// againBtn.addEventListener('click', ()=>{
+//   resultCard.classList.remove('show');
+//   hint.textContent = 'Click "Spin the wheel", let it fly, then click "Stop!" to lock in your fortune.';
+// });
+</script>
+</body>
+</html>
